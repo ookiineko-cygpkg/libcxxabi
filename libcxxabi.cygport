@@ -1,0 +1,46 @@
+inherit clang cmake
+
+NAME="libcxxabi"
+VERSION=5.0.1
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="C++ ABI library for Clang"
+DESCRIPTION="Clang is an LLVM native C/C++/ObjC compiler, which aims to deliver
+amazingly fast compiles, extremely useful error and warning messages and to
+provide a platform for building great source level tools. The Clang Static
+Analyzer is a tool that automatically finds bugs in your code, and is a great
+example of the sort of tool that can be built using the Clang frontend as a
+library to parse C/C++ code."
+HOMEPAGE="http://clang.llvm.org/"
+SRC_URI="http://www.llvm.org/releases/${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
+SRC_DIR="libcxxabi-${VERSION}.src"
+PATCH_URI="
+	5.0.1-cygming-dllexport.patch
+	5.0.1-cygming-install.patch
+	5.0.1-cygming-seh.patch
+	5.0.1-cygwin-atexit.patch
+	5.0.1-cygwin-nodefaultlibs.patch
+"
+
+PKG_NAMES="libc++abi1 libc++abi-devel"
+libc__abi1_CONTENTS="usr/bin/cygc++abi-1.dll usr/share/doc/${NAME}"
+libc__abi_devel_CONTENTS="usr/include/*cxxabi* usr/lib/libc++abi.*"
+
+LDFLAGS+=" -Wl,--export-all-symbols"
+
+src_compile() {
+	cd ${B}
+	cygcmake \
+		-DLIBCXXABI_ENABLE_SHARED=ON \
+		-DLIBCXXABI_ENABLE_STATIC=ON \
+		-DLIBCXXABI_LIBCXX_INCLUDES=/usr/include/c++/v1/ \
+		-DLIBCXXABI_USE_COMPILER_RT=OFF
+	cygmake
+}
+
+src_install() {
+	cd ${B}
+	cyginstall
+	doinclude ${S}/include/*.h
+	dodoc ${S}/*.TXT
+}
