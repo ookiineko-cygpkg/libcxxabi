@@ -1,38 +1,38 @@
---- origsrc/libcxxabi-5.0.1.src/include/cxxabi.h	2017-03-01 05:42:01.000000000 -0600
-+++ src/libcxxabi-5.0.1.src/include/cxxabi.h	2018-01-02 20:07:41.337412400 -0600
+--- origsrc/libcxxabi-8.0.1.src/include/cxxabi.h	2019-07-21 23:51:14.010579000 -0400
++++ src/libcxxabi-8.0.1.src/include/cxxabi.h	2019-07-21 23:51:32.765604900 -0400
 @@ -160,7 +160,7 @@ __cxa_decrement_exception_refcount(void
  extern _LIBCXXABI_FUNC_VIS bool __cxa_uncaught_exception() throw();
  extern _LIBCXXABI_FUNC_VIS unsigned int __cxa_uncaught_exceptions() throw();
  
--#ifdef __linux__
-+#if defined(__linux__) || defined(__CYGWIN__)
- // Linux TLS support. Not yet an official part of the Itanium ABI.
+-#if defined(__linux__) || defined(__Fuchsia__)
++#if defined(__linux__) || defined(__Fuchsia__) || defined(__CYGWIN__)
+ // Linux and Fuchsia TLS support. Not yet an official part of the Itanium ABI.
  // https://sourceware.org/glibc/wiki/Destructor%20support%20for%20thread_local%20variables
  extern _LIBCXXABI_FUNC_VIS int __cxa_thread_atexit(void (*)(void *), void *,
---- origsrc/libcxxabi-5.0.1.src/src/CMakeLists.txt	2017-07-10 20:42:26.000000000 -0500
-+++ src/libcxxabi-5.0.1.src/src/CMakeLists.txt	2018-01-02 20:07:41.337412400 -0600
+--- origsrc/libcxxabi-8.0.1.src/src/CMakeLists.txt	2019-07-21 23:51:14.463702400 -0400
++++ src/libcxxabi-8.0.1.src/src/CMakeLists.txt	2019-07-21 23:51:58.057637200 -0400
 @@ -31,7 +31,7 @@ else()
    list(APPEND LIBCXXABI_SOURCES cxa_noexception.cpp)
  endif()
  
--if (LIBCXXABI_ENABLE_THREADS AND UNIX AND NOT (APPLE OR CYGWIN))
-+if (LIBCXXABI_ENABLE_THREADS AND UNIX AND NOT APPLE)
+-if (LIBCXXABI_ENABLE_THREADS AND (UNIX OR FUCHSIA) AND NOT (APPLE OR CYGWIN))
++if (LIBCXXABI_ENABLE_THREADS AND (UNIX OR FUCHSIA) AND NOT APPLE)
    list(APPEND LIBCXXABI_SOURCES cxa_thread_atexit.cpp)
  endif()
  
---- origsrc/libcxxabi-5.0.1.src/src/cxa_thread_atexit.cpp	2017-02-28 21:55:57.000000000 -0600
-+++ src/libcxxabi-5.0.1.src/src/cxa_thread_atexit.cpp	2018-01-02 20:07:41.337412400 -0600
+--- origsrc/libcxxabi-8.0.1.src/src/cxa_thread_atexit.cpp	2017-02-28 22:55:57.000000000 -0500
++++ src/libcxxabi-8.0.1.src/src/cxa_thread_atexit.cpp	2019-07-21 23:56:29.101763000 -0400
 @@ -107,9 +107,12 @@ extern "C" {
  #ifdef HAVE___CXA_THREAD_ATEXIT_IMPL
      return __cxa_thread_atexit_impl(dtor, obj, dso_symbol);
  #else
-+#if !defined(__CYGWIN__)
++#ifndef __CYGWIN__
      if (__cxa_thread_atexit_impl) {
        return __cxa_thread_atexit_impl(dtor, obj, dso_symbol);
 -    } else {
 +    } else
 +#endif
-+    {
++   {
        // Initialize the dtors std::__libcpp_tls_key (uses __cxa_guard_*() for
        // one-time initialization and __cxa_atexit() for destruction)
        static DtorsManager manager;

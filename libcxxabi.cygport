@@ -1,7 +1,8 @@
+CYGCMAKE_GENERATOR=Ninja
 inherit clang cmake
 
 NAME="libcxxabi"
-VERSION=7.0.1
+VERSION=8.0.1
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="C++ ABI library for Clang"
@@ -12,12 +13,12 @@ Analyzer is a tool that automatically finds bugs in your code, and is a great
 example of the sort of tool that can be built using the Clang frontend as a
 library to parse C/C++ code."
 HOMEPAGE="http://clang.llvm.org/"
-SRC_URI="http://www.llvm.org/releases/${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
+SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/${NAME}-${VERSION}.src.tar.xz"
 SRC_DIR="libcxxabi-${VERSION}.src"
 PATCH_URI="
 	5.0.1-cygming-dllexport.patch
 	7.0.1-cygming-install.patch
-	5.0.1-cygwin-atexit.patch
+	8.0.1-cygwin-atexit.patch
 	5.0.1-cygwin-nodefaultlibs.patch
 "
 
@@ -28,18 +29,31 @@ libc__abi_devel_CONTENTS="usr/include/*cxxabi* usr/lib/libc++abi.*"
 LDFLAGS+=" -Wl,--export-all-symbols"
 
 src_compile() {
-	cd ${B}
+	mkdir -p ${B}/shared
+	cd ${B}/shared
 	cygcmake \
 		-DLIBCXXABI_ENABLE_SHARED=ON \
+		-DLIBCXXABI_ENABLE_STATIC=OFF \
+		-DLIBCXXABI_LIBCXX_INCLUDES=/usr/include/c++/v1/ \
+		-DLIBCXXABI_USE_COMPILER_RT=ON \
+		-DLIBCXXABI_USE_LLVM_UNWINDER=ON
+	cygninja
+	mkdir -p ${B}/static
+	cd ${B}/static
+	cygcmake \
+		-DLIBCXXABI_ENABLE_SHARED=OFF \
 		-DLIBCXXABI_ENABLE_STATIC=ON \
 		-DLIBCXXABI_LIBCXX_INCLUDES=/usr/include/c++/v1/ \
-		-DLIBCXXABI_USE_COMPILER_RT=ON
-	cygmake
+		-DLIBCXXABI_USE_COMPILER_RT=ON \
+		-DLIBCXXABI_USE_LLVM_UNWINDER=ON
+	cygninja
 }
 
 src_install() {
-	cd ${B}
-	cyginstall
+	cd ${B}/static
+	ninja_install
+	cd ${B}/shared
+	ninja_install
 	doinclude ${S}/include/*.h
 	dodoc ${S}/*.TXT
 }
