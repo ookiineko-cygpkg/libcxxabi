@@ -1,6 +1,6 @@
---- origsrc/libcxxabi-8.0.1.src/include/cxxabi.h	2019-07-21 23:51:14.010579000 -0400
-+++ src/libcxxabi-8.0.1.src/include/cxxabi.h	2019-07-21 23:51:32.765604900 -0400
-@@ -160,7 +160,7 @@ __cxa_decrement_exception_refcount(void
+--- origsrc/libcxxabi-9.0.1.src/include/cxxabi.h	2020-05-05 04:39:52.380228200 -0400
++++ src/libcxxabi-9.0.1.src/include/cxxabi.h	2020-05-05 04:40:59.286718100 -0400
+@@ -159,7 +159,7 @@ __cxa_decrement_exception_refcount(void
  extern _LIBCXXABI_FUNC_VIS bool __cxa_uncaught_exception() throw();
  extern _LIBCXXABI_FUNC_VIS unsigned int __cxa_uncaught_exceptions() throw();
  
@@ -9,24 +9,24 @@
  // Linux and Fuchsia TLS support. Not yet an official part of the Itanium ABI.
  // https://sourceware.org/glibc/wiki/Destructor%20support%20for%20thread_local%20variables
  extern _LIBCXXABI_FUNC_VIS int __cxa_thread_atexit(void (*)(void *), void *,
---- origsrc/libcxxabi-8.0.1.src/src/CMakeLists.txt	2019-07-21 23:51:14.463702400 -0400
-+++ src/libcxxabi-8.0.1.src/src/CMakeLists.txt	2019-07-21 23:51:58.057637200 -0400
-@@ -31,7 +31,7 @@ else()
-   list(APPEND LIBCXXABI_SOURCES cxa_noexception.cpp)
+--- origsrc/libcxxabi-9.0.1.src/src/CMakeLists.txt	2020-05-05 04:39:52.645893900 -0400
++++ src/libcxxabi-9.0.1.src/src/CMakeLists.txt	2020-05-05 04:41:10.395881400 -0400
+@@ -35,7 +35,7 @@ else()
+   )
  endif()
  
 -if (LIBCXXABI_ENABLE_THREADS AND (UNIX OR FUCHSIA) AND NOT (APPLE OR CYGWIN))
 +if (LIBCXXABI_ENABLE_THREADS AND (UNIX OR FUCHSIA) AND NOT APPLE)
-   list(APPEND LIBCXXABI_SOURCES cxa_thread_atexit.cpp)
- endif()
- 
---- origsrc/libcxxabi-8.0.1.src/src/cxa_thread_atexit.cpp	2017-02-28 22:55:57.000000000 -0500
-+++ src/libcxxabi-8.0.1.src/src/cxa_thread_atexit.cpp	2019-07-21 23:56:29.101763000 -0400
-@@ -107,9 +107,12 @@ extern "C" {
+   list(APPEND LIBCXXABI_SOURCES
+     cxa_thread_atexit.cpp
+   )
+--- origsrc/libcxxabi-9.0.1.src/src/cxa_thread_atexit.cpp	2019-12-11 14:15:30.000000000 -0500
++++ src/libcxxabi-9.0.1.src/src/cxa_thread_atexit.cpp	2020-05-05 04:40:59.302237100 -0400
+@@ -112,9 +112,12 @@ extern "C" {
  #ifdef HAVE___CXA_THREAD_ATEXIT_IMPL
      return __cxa_thread_atexit_impl(dtor, obj, dso_symbol);
  #else
-+#ifndef __CYGWIN__
++#if !(defined __CYGWIN__ || defined _WIN32)
      if (__cxa_thread_atexit_impl) {
        return __cxa_thread_atexit_impl(dtor, obj, dso_symbol);
 -    } else {

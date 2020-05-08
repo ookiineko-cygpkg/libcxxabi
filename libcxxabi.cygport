@@ -2,7 +2,7 @@ CYGCMAKE_GENERATOR=Ninja
 inherit clang cmake
 
 NAME="libcxxabi"
-VERSION=8.0.1
+VERSION=9.0.1
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="C++ ABI library for Clang"
@@ -13,12 +13,12 @@ Analyzer is a tool that automatically finds bugs in your code, and is a great
 example of the sort of tool that can be built using the Clang frontend as a
 library to parse C/C++ code."
 HOMEPAGE="http://clang.llvm.org/"
-SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/${NAME}-${VERSION}.src.tar.xz"
+SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
 SRC_DIR="libcxxabi-${VERSION}.src"
 PATCH_URI="
 	5.0.1-cygming-dllexport.patch
-	7.0.1-cygming-install.patch
-	8.0.1-cygwin-atexit.patch
+	9.0.1-cygming-install.patch
+	9.0.1-cygwin-atexit.patch
 	5.0.1-cygwin-nodefaultlibs.patch
 "
 
