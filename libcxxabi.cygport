@@ -21,6 +21,7 @@ PATCH_URI="
 	9.0.1-cygwin-atexit.patch
 	5.0.1-cygwin-nodefaultlibs.patch
 "
+RESTRICT="debuginfo"
 
 PKG_NAMES="libc++abi1 libc++abi-devel"
 libc__abi1_CONTENTS="usr/bin/cygc++abi-1.dll usr/share/doc/${NAME}"
