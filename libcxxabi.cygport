@@ -37,7 +37,8 @@ src_compile() {
 		-DLIBCXXABI_ENABLE_STATIC=OFF \
 		-DLIBCXXABI_LIBCXX_INCLUDES=/usr/include/c++/v1/ \
 		-DLIBCXXABI_USE_COMPILER_RT=ON \
-		-DLIBCXXABI_USE_LLVM_UNWINDER=ON
+		-DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+		-DLLVM_CONFIG_PATH=/usr/bin/llvm-config
 	cygninja
 	mkdir -p ${B}/static
 	cd ${B}/static
@@ -46,7 +47,8 @@ src_compile() {
 		-DLIBCXXABI_ENABLE_STATIC=ON \
 		-DLIBCXXABI_LIBCXX_INCLUDES=/usr/include/c++/v1/ \
 		-DLIBCXXABI_USE_COMPILER_RT=ON \
-		-DLIBCXXABI_USE_LLVM_UNWINDER=ON
+		-DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+		-DLLVM_CONFIG_PATH=/usr/bin/llvm-config
 	cygninja
 }
 
