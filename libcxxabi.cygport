@@ -2,7 +2,7 @@ CYGCMAKE_GENERATOR=Ninja
 inherit clang cmake
 
 NAME="libcxxabi"
-VERSION=10.0.1
+VERSION=11.0.0
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="C++ ABI library for Clang"
@@ -16,6 +16,7 @@ HOMEPAGE="http://clang.llvm.org/"
 SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
 SRC_DIR="libcxxabi-${VERSION}.src"
 PATCH_URI="
+	https://src.fedoraproject.org/rpms/${PN}/raw/f33/f/0001-${PN}-Remove-monorepo-requirement.patch
 	5.0.1-cygming-dllexport.patch
 	9.0.1-cygming-install.patch
 	9.0.1-cygwin-atexit.patch
