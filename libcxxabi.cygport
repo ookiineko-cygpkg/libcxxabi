@@ -4,7 +4,7 @@ inherit clang cmake
 BUILD_REQUIRES=" libc++-devel"
 
 NAME="libcxxabi"
-VERSION=13.0.1
+VERSION=14.0.5
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="C++ ABI library for Clang"
@@ -18,14 +18,14 @@ HOMEPAGE="http://clang.llvm.org/"
 SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
 SRC_DIR="libcxxabi-${VERSION}.src"
 PATCH_URI="
-	https://src.fedoraproject.org/rpms/${PN}/raw/f35/f/0001-PATCH-${PN}-Include-refstring.h-from-system-incl.patch
-	https://src.fedoraproject.org/rpms/${PN}/raw/f35/f/0002-PATCH-${PN}-Remove-monorepo-requirement.patch
+	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/0001-PATCH-${PN}-Include-refstring.h-from-system-incl.patch
+	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/0002-PATCH-${PN}-Remove-monorepo-requirement.patch
+	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/add-llvm-cmake-package.patch
 	5.0.1-cygming-dllexport.patch
-	9.0.1-cygming-install.patch
 	9.0.1-cygwin-atexit.patch
 	5.0.1-cygwin-nodefaultlibs.patch
 "
-RESTRICT="debuginfo"
+RESTRICT="debuginfo strip"
 
 PKG_NAMES="libc++abi1 libc++abi-devel"
 libc__abi1_CONTENTS="usr/bin/cygc++abi-1.dll usr/share/doc/${NAME}"
