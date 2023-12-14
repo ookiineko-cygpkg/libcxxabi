@@ -1,6 +1,8 @@
 CYGCMAKE_GENERATOR=Ninja
 inherit clang cmake
 
+BUILD_REQUIRES=" libc++-devel"
+
 NAME="libcxxabi"
 VERSION=13.0.1
 RELEASE=1
