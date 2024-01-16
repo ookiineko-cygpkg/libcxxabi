@@ -4,7 +4,7 @@ inherit clang cmake
 BUILD_REQUIRES=" libc++-devel"
 
 NAME="libcxxabi"
-VERSION=14.0.5
+VERSION=15.0.7
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="C++ ABI library for Clang"
@@ -15,23 +15,31 @@ Analyzer is a tool that automatically finds bugs in your code, and is a great
 example of the sort of tool that can be built using the Clang frontend as a
 library to parse C/C++ code."
 HOMEPAGE="http://clang.llvm.org/"
-SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/libcxxabi-${VERSION}.src.tar.xz"
+SRC_URI="
+  https://github.com/llvm/llvm-project/releases/download/llvmorg-${PV}/${P}.src.tar.xz
+  https://github.com/llvm/llvm-project/releases/download/llvmorg-${PV}/cmake-${PV}.src.tar.xz
+"
 SRC_DIR="libcxxabi-${VERSION}.src"
 PATCH_URI="
-	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/0001-PATCH-${PN}-Include-refstring.h-from-system-incl.patch
-	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/0002-PATCH-${PN}-Remove-monorepo-requirement.patch
-	https://src.fedoraproject.org/rpms/${PN}/raw/f36/f/add-llvm-cmake-package.patch
+	https://src.fedoraproject.org/rpms/${PN}/raw/f37/f/0001-PATCH-${PN}-Include-refstring.h-from-system-incl.patch
+	https://src.fedoraproject.org/rpms/${PN}/raw/f37/f/0001-Fixup-libcxx-include-path.patch
 	5.0.1-cygming-dllexport.patch
 	9.0.1-cygwin-atexit.patch
 	5.0.1-cygwin-nodefaultlibs.patch
+	15.0.7-out-of-tree-libunwind.patch
 "
 RESTRICT="debuginfo strip"
 
 PKG_NAMES="libc++abi1 libc++abi-devel"
 libc__abi1_CONTENTS="usr/bin/cygc++abi-1.dll usr/share/doc/${NAME}"
-libc__abi_devel_CONTENTS="usr/include/*cxxabi* usr/lib/libc++abi.*"
+libc__abi_devel_CONTENTS="usr/include/c++/v1/*cxxabi* usr/lib/libc++abi.*"
 
 LDFLAGS+=" -Wl,--export-all-symbols"
+
+CYGPORT_USE_UNSTABLE_API=1
+src_unpack_hook() {
+    mv ../cmake{-${PV}.src,}
+}
 
 src_compile() {
 	mkdir -p ${B}/shared
@@ -57,10 +65,24 @@ src_compile() {
 }
 
 src_install() {
-	cd ${B}/static
-	ninja_install
+	# Manually link libc++.a against libunwind.a, because the libcxxabi build system doesn't support using system libunwind.
+	pushd ${B}
+	ar cqT tmp.a `find static -name libc++abi.a` /usr/lib/libunwind.a
+	ar -M << EOM
+CREATE tmp.a
+ADDLIB tmp.a
+SAVE
+END
+EOM
+	mv tmp.a libc++abi.a
+	ranlib libc++abi.a
+	popd
+	install -D -m 0644 ${B}/libc++abi.a ${D}/usr/lib/libc++abi.a
+	rm -f ${B}/libc++abi.a
+
 	cd ${B}/shared
 	ninja_install
+	includeinto c++/v1
 	doinclude ${S}/include/*.h
 	dodoc ${S}/*.TXT
 }

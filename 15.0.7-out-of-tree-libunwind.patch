@@ -1,0 +1,19 @@
+--- origsrc/libcxxabi-15.0.7.src/src/CMakeLists.txt	2024-01-16 18:11:58.697117600 +0800
++++ src/libcxxabi-15.0.7.src/src/CMakeLists.txt	2024-01-16 18:25:12.470041500 +0800
+@@ -164,10 +164,16 @@
+ add_library(cxxabi_shared_objects OBJECT EXCLUDE_FROM_ALL ${LIBCXXABI_SOURCES} ${LIBCXXABI_HEADERS})
+ if (LIBCXXABI_USE_LLVM_UNWINDER)
+   if (LIBCXXABI_STATICALLY_LINK_UNWINDER_IN_SHARED_LIBRARY)
++    if (TARGET unwind_shared_objects)
+     target_link_libraries(cxxabi_shared_objects PUBLIC unwind_shared_objects) # propagate usage requirements
+     target_sources(cxxabi_shared_objects PUBLIC $<TARGET_OBJECTS:unwind_shared_objects>)
++    endif()
+   else()
++    if (TARGET unwind_shared)
+     target_link_libraries(cxxabi_shared_objects PUBLIC unwind_shared)
++    else()
++    target_link_libraries(cxxabi_shared_objects PUBLIC unwind)
++    endif()
+   endif()
+ endif()
+ target_link_libraries(cxxabi_shared_objects PRIVATE ${LIBCXXABI_BUILTINS_LIBRARY} ${LIBCXXABI_SHARED_LIBRARIES} ${LIBCXXABI_LIBRARIES})

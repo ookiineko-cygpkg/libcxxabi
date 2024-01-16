@@ -1,25 +1,26 @@
 --- origsrc/libcxxabi-5.0.1.src/CMakeLists.txt	2017-07-19 09:04:19.000000000 -0500
 +++ src/libcxxabi-5.0.1.src/CMakeLists.txt	2018-01-02 22:00:45.689845500 -0600
-@@ -281,7 +281,10 @@ endif()
- add_definitions(-D_LIBCPP_BUILDING_LIBRARY)
+@@ -137,7 +137,7 @@
+     "Specify path to libc++ includes.")
  
- # Disable DLL annotations on Windows for static builds.
--if (WIN32 AND LIBCXXABI_ENABLE_STATIC AND NOT LIBCXXABI_ENABLE_SHARED)
+ set(LIBCXXABI_HERMETIC_STATIC_LIBRARY_DEFAULT OFF)
+-if (WIN32)
++if (WIN32 OR CYGWIN)
+   set(LIBCXXABI_HERMETIC_STATIC_LIBRARY_DEFAULT ON)
+ endif()
+ option(LIBCXXABI_HERMETIC_STATIC_LIBRARY
+@@ -281,6 +281,11 @@ endif()
+ # libcxxabi needs to, for various reasons, include the libcpp headers as if
+ # it is being built as part of libcxx.
+ add_definitions(-D_LIBCPP_BUILDING_LIBRARY)
++
 +if (WIN32 OR CYGWIN)
 +  # do not mark references to __cxa_* as dllimport
 +  list(APPEND LIBCXXABI_COMPILE_FLAGS -Xclang -flto-visibility-public-std)
-+  if (LIBCXXABI_ENABLE_STATIC AND NOT LIBCXXABI_ENABLE_SHARED)
-   if (LIBCXX_ENABLE_SHARED AND LIBCXX_ENABLE_STATIC_ABI_LIBRARY)
-     # Building libcxxabi statically, but intending for it to be statically
-     # linked into a shared libcxx; keep dllexport enabled within libcxxabi,
-@@ -290,6 +293,7 @@
-     # Regular static build; disable dllexports.
-     add_definitions(-D_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS)
-   endif()
-+  endif()
- endif()
++endif()
  
  add_compile_flags_if_supported(-Werror=return-type)
+ 
 --- origsrc/libcxxabi-5.0.1.src/include/__cxxabi_config.h	2017-03-01 05:42:01.000000000 -0600
 +++ src/libcxxabi-5.0.1.src/include/__cxxabi_config.h	2018-01-02 20:07:41.321782200 -0600
 @@ -19,7 +19,7 @@
